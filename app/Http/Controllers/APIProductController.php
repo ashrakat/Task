@@ -73,12 +73,16 @@ class APIProductController extends Controller {
 	 */
 	 public function getProduct( Request $request) {
 		 $name = $request->get('name');
-		 $product = Product::where( [ 'name' => $name ] )->first();
-    	if(!$product){
-				return view('products.search', ['error' => 'product does not exist']);
-    	}
-    	else
+		 $validator = Validator::make( $request->toArray(), [
+ 			'name' => 'required|exists:products',
+ 		 ]);
+		 if ($validator->fails()) {
+			 	return response()->view('products.search', ['error' => 'product does not exist'],400);
+		 }
+     else{
+				$product = Product::where( [ 'name' => $name ] )->first();
       	$response['response'] = $product;
-			return view('products.search', ['product' => $product]);
+			  return response()->view('products.search', ['product' => $product],200);
 		}
+	}
 }
